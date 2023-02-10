@@ -48,6 +48,7 @@ class OnPolicyAlgorithm(BaseAlgorithm):
         Setting it to auto, the code will be run on the GPU if possible.
     :param _init_setup_model: Whether or not to build the network at the creation of the instance
     :param supported_action_spaces: The action spaces supported by the algorithm.
+    :param n_step_advantage: if true, uses n_step_advantage
     """
 
     def __init__(
@@ -55,6 +56,7 @@ class OnPolicyAlgorithm(BaseAlgorithm):
         policy: Union[str, Type[ActorCriticPolicy]],
         env: Union[GymEnv, str],
         learning_rate: Union[float, Schedule],
+        n_step_advantage: bool,
         n_steps: int,
         gamma: float,
         gae_lambda: float,
@@ -88,6 +90,7 @@ class OnPolicyAlgorithm(BaseAlgorithm):
         )
 
         self.n_steps = n_steps
+        self.n_step_advantage = n_step_advantage
         self.gamma = gamma
         self.gae_lambda = gae_lambda
         self.ent_coef = ent_coef
@@ -112,6 +115,7 @@ class OnPolicyAlgorithm(BaseAlgorithm):
             gamma=self.gamma,
             gae_lambda=self.gae_lambda,
             n_envs=self.n_envs,
+            n_step_advantage = self.n_step_advantage
         )
         self.policy = self.policy_class(  # pytype:disable=not-instantiable
             self.observation_space,
@@ -265,6 +269,8 @@ class OnPolicyAlgorithm(BaseAlgorithm):
                 self.logger.dump(step=self.num_timesteps)
 
             self.train()
+        if self.n_step_advantage:
+            self.logger.log('Modified A2C using n_step_advantage')
 
         callback.on_training_end()
 

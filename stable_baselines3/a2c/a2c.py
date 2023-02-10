@@ -50,6 +50,7 @@ class A2C(OnPolicyAlgorithm):
     :param device: Device (cpu, cuda, ...) on which the code should be run.
         Setting it to auto, the code will be run on the GPU if possible.
     :param _init_setup_model: Whether or not to build the network at the creation of the instance
+    :param n_step_advantage: If True, compute_returns_and_advantage uses n_step bootstrap method
     """
 
     policy_aliases: Dict[str, Type[BasePolicy]] = {
@@ -63,6 +64,7 @@ class A2C(OnPolicyAlgorithm):
         policy: Union[str, Type[ActorCriticPolicy]],
         env: Union[GymEnv, str],
         learning_rate: Union[float, Schedule] = 7e-4,
+        n_step_advantage: bool = False,
         n_steps: int = 5,
         gamma: float = 0.99,
         gae_lambda: float = 1.0,
@@ -88,6 +90,7 @@ class A2C(OnPolicyAlgorithm):
             n_steps=n_steps,
             gamma=gamma,
             gae_lambda=gae_lambda,
+            n_step_advantage = n_step_advantage,
             ent_coef=ent_coef,
             vf_coef=vf_coef,
             max_grad_norm=max_grad_norm,
